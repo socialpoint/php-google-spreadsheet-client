@@ -204,8 +204,12 @@ class Worksheet
         $serviceRequest->getRequest()->setFullUrl($this->getCellFeedUrl());
         $res = $serviceRequest->execute();
         $xml = new \SimpleXMLElement($res);
-        $postUrl = Util::getLinkHref($xml, 'http://schemas.google.com/g/2005#post');
-        return $postUrl;
+
+        try {
+            return Util::getLinkHref($xml, 'http://schemas.google.com/g/2005#post');
+        } catch (Exception $e) {
+            return null;
+        }
     }
 
     /**

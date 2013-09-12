@@ -57,7 +57,11 @@ class WorksheetFeed extends \ArrayIterator
      */
     private function getPostUrl()
     {
-        return Util::getLinkHref($this->xml, 'http://schemas.google.com/g/2005#post');
+        try {
+            return Util::getLinkHref($this->xml, 'http://schemas.google.com/g/2005#post');
+        } catch (Exception $e) {
+            return null;
+        }
     }
 
     /**
