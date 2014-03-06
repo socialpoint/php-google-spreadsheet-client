@@ -28,14 +28,14 @@ class Spreadsheet
 {
     /**
      * The spreadsheet xml object
-     * 
+     *
      * @var \SimpleXMLElement
      */
     private $xml;
 
     /**
      * Initializes the spreadsheet object
-     * 
+     *
      * @param string|\SimpleXMLElement $xml
      */
     public function __construct($xml) {
@@ -47,7 +47,7 @@ class Spreadsheet
 
     /**
      * Get the spreadsheet xml
-     * 
+     *
      * @return \SimpleXMLElement
      */
     public function getXml()
@@ -57,7 +57,7 @@ class Spreadsheet
 
     /**
      * Get all the worksheets which belong to this spreadsheet
-     * 
+     *
      * @return \Google\Spreadsheet\WorksheetFeed
      */
     public function getWorksheets()
@@ -70,7 +70,7 @@ class Spreadsheet
 
     /**
      * Add a new worksheet to this spreadsheet
-     * 
+     *
      * @param string $title
      *
      * @return \Google\Spreadsheet\Worksheet
@@ -97,7 +97,7 @@ class Spreadsheet
 
     /**
      * Returns the feed url of the spreadsheet
-     * 
+     *
      * @return string
      */
     public function getFeedUrl() {
@@ -106,11 +106,25 @@ class Spreadsheet
 
     /**
      * Returns the title (name) of the spreadsheet
-     * 
+     *
      * @return string
      */
     public function getTitle() {
         return $this->xml->title->__toString();
     }
 
+
+    /**
+     * Returns the id of the spreadsheet
+     *
+     * @return string
+     */
+    public function getId()
+    {
+        return str_replace(
+            'https://spreadsheets.google.com/feeds/spreadsheets/private/full/',
+            '',
+            $this->xml->id->__toString()
+        );
+    }
 }
