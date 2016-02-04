@@ -49,7 +49,7 @@ class CellFeed
      */
     public function __construct($xml)
     {
-        $this->xml = new SimpleXMLElement($xml);
+        $this->xml = simplexml_load_string($xml, 'SimpleXMLElement', LIBXML_COMPACT | LIBXML_PARSEHUGE);
         $this->entries = array();
     }
 
