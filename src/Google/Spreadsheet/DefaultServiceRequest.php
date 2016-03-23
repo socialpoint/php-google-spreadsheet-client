@@ -304,10 +304,17 @@ class DefaultServiceRequest implements ServiceRequestInterface
      */
     protected function execute($ch)
     {
-        $ret = curl_exec($ch);
+        $maxTries = 10;
 
-        $info = curl_getinfo($ch);
-        $httpCode = (int)$info['http_code'];
+        do {
+            $currentTry = 1;
+            $ret = curl_exec($ch);
+
+            $info = curl_getinfo($ch);
+            $httpCode = (int)$info['http_code'];
+
+            $currentTry++;
+        } while($httpCode == 500 && $currentTry < $maxTries);
 
         if ($httpCode > 299) {
             switch ($httpCode) {
