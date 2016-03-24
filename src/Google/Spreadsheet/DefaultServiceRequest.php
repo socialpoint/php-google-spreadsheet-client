@@ -305,9 +305,9 @@ class DefaultServiceRequest implements ServiceRequestInterface
     protected function execute($ch)
     {
         $maxTries = 10;
+        $currentTry = 1;
 
         do {
-            $currentTry = 1;
             $ret = curl_exec($ch);
 
             $info = curl_getinfo($ch);
