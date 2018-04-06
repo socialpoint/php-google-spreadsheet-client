@@ -16,6 +16,9 @@
  */
 namespace Google\Spreadsheet;
 
+use GuzzleHttp\ClientInterface;
+use GuzzleHttp\Promise;
+use GuzzleHttp\Psr7\Response;
 use SimpleXMLElement;
 use DateTime;
 
@@ -82,10 +85,11 @@ class Spreadsheet
      * 
      * @return \Google\Spreadsheet\WorksheetFeed
      */
-    public function getWorksheets()
+    public function getWorksheets(ClientInterface $client)
     {
-        $res = ServiceRequestFactory::getInstance()->get($this->getWorksheetsFeedUrl());
-        return new WorksheetFeed($res);
+        $response = $client->request('get', $this->getWorksheetsFeedUrl())->getBody()->getContents();
+
+        return new WorksheetFeed($response);
     }
 
     /**
@@ -94,13 +98,18 @@ class Spreadsheet
      * @return array
      * @throws Exception
      */
-    public function getWorksheetCellFeeds(array $worksheets)
+    public function getWorksheetCellFeeds(array $worksheets, ClientInterface $client)
     {
-        $urls = $this->getWorksheetCellsUrls($worksheets);
-        $cellsData = ServiceRequestFactory::getInstance()->getMulti($urls);
+        $promises = $this->getWorksheetCellsUrls($worksheets, $client);
+
+        /**
+         * @var Response[] $cellsResponses
+         */
+        $cellsResponses = Promise\unwrap($promises);
+
         $cellFeeds = [];
-        foreach ($cellsData as $title => $cellData) {
-            $cellFeeds[$title] = new CellFeed($cellData);
+        foreach ($cellsResponses as $title => $cellResponse) {
+            $cellFeeds[$title] = new CellFeed($cellResponse->getBody()->getContents());
         }
         return $cellFeeds;
     }
@@ -109,12 +118,13 @@ class Spreadsheet
      * @return array
      * @throws Exception
      */
-    private function getWorksheetCellsUrls(array $worksheets)
+    private function getWorksheetCellsUrls(array $worksheets, ClientInterface $client)
     {
         $urls = [];
         foreach ($worksheets as $title => $workSheet) {
-            $urls[$title] = $workSheet->getCellFeedUrl();
+            $urls[$title] = $client->getAsync($workSheet->getCellFeedUrl());
         }
+
         return $urls;
     }
 
